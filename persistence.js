@@ -17,7 +17,7 @@ function MemoryPersistence () {
 
   this._retained = []
   // clientId -> topic -> qos
-  this._subscriptions = new Map()
+  this._subscriptions = new WeakMap()
   this._clientsCount = 0
   this._trie = new QlobberSub(QlobberOpts)
   this._outgoing = {}
@@ -72,12 +72,12 @@ MemoryPersistence.prototype.createRetainedStreamCombi = function (patterns) {
 }
 
 MemoryPersistence.prototype.addSubscriptions = function (client, subs, cb) {
-  var stored = this._subscriptions.get(client.id)
+  var stored = this._subscriptions.get(client)
   var trie = this._trie
 
   if (!stored) {
     stored = new Map()
-    this._subscriptions.set(client.id, stored)
+    this._subscriptions.set(client, stored)
     this._clientsCount++
   }
 
@@ -104,7 +104,7 @@ MemoryPersistence.prototype.addSubscriptions = function (client, subs, cb) {
 }
 
 MemoryPersistence.prototype.removeSubscriptions = function (client, subs, cb) {
-  var stored = this._subscriptions.get(client.id)
+  var stored = this._subscriptions.get(client)
   var trie = this._trie
 
   if (stored) {
@@ -121,7 +121,7 @@ MemoryPersistence.prototype.removeSubscriptions = function (client, subs, cb) {
 
     if (stored.size === 0) {
       this._clientsCount--
-      this._subscriptions.delete(client.id)
+      this._subscriptions.delete(client)
     }
   }
 
@@ -130,7 +130,7 @@ MemoryPersistence.prototype.removeSubscriptions = function (client, subs, cb) {
 
 MemoryPersistence.prototype.subscriptionsByClient = function (client, cb) {
   var subs = null
-  var stored = this._subscriptions.get(client.id)
+  var stored = this._subscriptions.get(client)
   if (stored) {
     subs = []
     for (var topicAndQos of stored) {
@@ -150,7 +150,7 @@ MemoryPersistence.prototype.subscriptionsByTopic = function (pattern, cb) {
 
 MemoryPersistence.prototype.cleanSubscriptions = function (client, cb) {
   var trie = this._trie
-  var stored = this._subscriptions.get(client.id)
+  var stored = this._subscriptions.get(client)
 
   if (stored) {
     for (var topicAndQos of stored) {
