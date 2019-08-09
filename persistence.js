@@ -161,7 +161,7 @@ MemoryPersistence.prototype.cleanSubscriptions = function (client, cb) {
     }
 
     this._clientsCount--
-    this._subscriptions.delete(client.id)
+    this._subscriptions.delete(client)
   }
 
   cb(null, client)
