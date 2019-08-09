@@ -189,14 +189,13 @@ function _outgoingEnqueue (sub, packet) {
 }
 
 MemoryPersistence.prototype.outgoingUpdate = function (client, packet, cb) {
-  var i
   var clientId = client.id
   var outgoing = this._outgoing[clientId] || []
   var temp
 
   this._outgoing[clientId] = outgoing
 
-  for (i = 0; i < outgoing.length; i++) {
+  for (var i = 0; i < outgoing.length; i++) {
     temp = outgoing[i]
     if (temp.brokerId === packet.brokerId) {
       if (temp.brokerCounter === packet.brokerCounter) {
@@ -221,14 +220,13 @@ MemoryPersistence.prototype.outgoingUpdate = function (client, packet, cb) {
 }
 
 MemoryPersistence.prototype.outgoingClearMessageId = function (client, packet, cb) {
-  var i
   var clientId = client.id
   var outgoing = this._outgoing[clientId] || []
   var temp
 
   this._outgoing[clientId] = outgoing
 
-  for (i = 0; i < outgoing.length; i++) {
+  for (var i = 0; i < outgoing.length; i++) {
     temp = outgoing[i]
     if (temp.messageId === packet.messageId) {
       outgoing.splice(i, 1)
