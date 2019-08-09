@@ -331,18 +331,16 @@ MemoryPersistence.prototype.streamWill = function (brokers) {
 }
 
 MemoryPersistence.prototype.getClientList = function (topic) {
-  var clientSubs = this._subscriptions
-  var entries = clientSubs.entries(clientSubs)
-  return from2.obj(function match (size, next) {
-    var entry
-    while (!(entry = entries.next()).done) {
-      if (entry.value[1].has(topic)) {
-        setImmediate(next, null, entry.value[0])
-        return
-      }
+  var entries = this._trie.match(topic, topic)
+  function match (size, next) {
+    if (entries.length === 0) {
+      return next(null, null)
     }
-    next(null, null)
-  })
+    var chunk = entries.slice(0, 1)
+    entries = entries.slice(1)
+    next(null, chunk[0].clientId)
+  }
+  return from2.obj(match)
 }
 
 MemoryPersistence.prototype.destroy = function (cb) {
